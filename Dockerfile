@@ -20,7 +20,7 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-ENV ERLANG_VERSION 1:20.1
+ARG ERLANG_VERSION=1:20.1
 
 RUN \
   echo "deb http://packages.erlang-solutions.com/ubuntu xenial contrib" >> /etc/apt/sources.list \
@@ -31,7 +31,7 @@ RUN \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV ELIXIR_VERSION 1.5.2
+ARG ELIXIR_VERSION=1.5.2
 
 WORKDIR /elixir
 RUN \
@@ -42,3 +42,4 @@ RUN \
     && ln -s /elixir/bin/elixir /usr/local/bin/elixir \
     && ln -s /elixir/bin/mix /usr/local/bin/mix \
     && ln -s /elixir/bin/iex /usr/local/bin/iex
+

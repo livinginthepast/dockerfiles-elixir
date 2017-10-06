@@ -1,0 +1,5 @@
+FROM livinginthepast/elixir
+
+RUN \
+  mix local.hex --force \
+    && mix local.rebar --force

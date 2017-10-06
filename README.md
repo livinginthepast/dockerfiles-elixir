@@ -14,6 +14,5 @@ FROM livinginthepast/elixir:1.5.2
 ## Building
 
 ```shell
-docker build -t $(cat repository)
-docker push $(cat repository)
+./bin/compile
 ```

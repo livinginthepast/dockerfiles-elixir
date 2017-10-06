@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+readonly DEFAULT_ERLANG='1:20.1'
+readonly DEFAULT_ELIXIR='1.5.2'
+
+ask_for_erlang_version() {
+  declare erlang_version
+  echo -n "Erlang version [${DEFAULT_ERLANG}]: " >&2
+  read erlang_version
+  echo "${erlang_version:-$DEFAULT_ERLANG}"
+}
+
+ask_for_elixir_version() {
+  echo -n "Elixir version [${DEFAULT_ELIXIR}]: " >&2
+  read elixir_version
+  echo "${elixir_version:-$DEFAULT_ELIXIR}"
+}
+
+build() {
+  declare erlang_version=$1 elixir_version=$2 dockerfile=$3 name=$4
+  local reference
+
+  reference=$(docker_reference ${name} ${elixir_version})
+
+  docker build \
+    --build-arg ERLANG_VERSION=${erlang_version} \
+    --build-arg ELIXIR_VERSION=${elixir_version} \
+    -t "${reference}" \
+    -f "${dockerfile}" \
+    .
+}
+
+push() {
+  declare name=$1 tag=$2
+  local reference
+
+  reference=$(docker_reference ${name} ${elixir_version})
+
+  docker push "${reference}"
+}
+
+docker_reference() {
+  declare name=$1 tag=$2
+
+  echo "livinginthepast/${name}:${tag}"
+}
+
+main() {
+  declare erlang_version elixir_version
+  erlang_version=$(ask_for_erlang_version)
+  elixir_version=$(ask_for_elixir_version)
+
+  echo "Erlang: ${erlang_version}, Elixir: ${elixir_version}"
+
+  echo "*** BUILDING MAIN DOCKER IMAGE"
+
+  build "${erlang_version}" "${elixir_version}" Dockerfile elixir
+  push elixir "${elixir_version}"
+
+  echo
+  echo "*** BUILDING HEX DOCKER IMAGE"
+
+  build "${erlang_version}" "${elixir_version}" Dockerfile-elixir-hex elixir-hex
+  push elixir-hex "${elixir_version}"
+}
+
+main
+
