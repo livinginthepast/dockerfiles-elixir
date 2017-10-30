@@ -1,4 +1,6 @@
-FROM livinginthepast/elixir
+ARG ELIXIR_VERSION=1.5.2
+
+FROM livinginthepast/elixir:$ELIXIR_VERSION
 
 RUN \
   mix local.hex --force \

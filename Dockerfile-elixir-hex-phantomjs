@@ -1,0 +1,28 @@
+ARG ELIXIR_VERSION=1.5.2
+FROM livinginthepast/elixir-hex:$ELIXIR_VERSION
+
+ENV PHANTOMJS_URL "https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/phantomjs-latest.tar.bz2"
+
+RUN \
+  apt-get update -qq \
+    && apt-get install -y \
+      curl \
+      libfontconfig \
+    && curl --silent --show-error --location --fail --retry 3 --output /tmp/phantomjs.tar.bz2 ${PHANTOMJS_URL} \
+    && tar -x -C /tmp -f /tmp/phantomjs.tar.bz2 \
+    && mv /tmp/phantomjs-*-linux-x86_64/bin/phantomjs /usr/local/bin \
+    && rm -rf /tmp/phantomjs.tar.bz2 /tmp/phantomjs-* \
+    && phantomjs --version \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ENV DISPLAY :99
+RUN \
+  printf '#!/bin/sh\nXvfb :99 -screen 0 1280x1024x24 &\nexec "$@"\n' > /tmp/entrypoint \
+    && chmod +x /tmp/entrypoint \
+    && mv /tmp/entrypoint /docker-entrypoint.sh
+
+LABEL com.circleci.preserve-entrypoint=true
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/bin/sh"]
