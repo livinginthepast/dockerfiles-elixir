@@ -68,6 +68,12 @@ main() {
 
   build "${erlang_version}" "${elixir_version}" Dockerfile-elixir-hex-phantomjs elixir-hex-phantomjs
   push elixir-hex-phantomjs "${elixir_version}"
+
+  echo
+  echo "*** BUILDING HEX PHANTOMJS BRUNCH DOCKER IMAGE"
+
+  build "${erlang_version}" "${elixir_version}" Dockerfile-elixir-hex-phantomjs-brunch elixir-hex-phantomjs-brunch
+  push elixir-hex-phantomjs-brunch "${elixir_version}"
 }
 
 main

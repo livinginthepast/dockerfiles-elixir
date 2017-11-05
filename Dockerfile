@@ -1,6 +1,6 @@
 FROM ubuntu:xenial
 
-ENV UPDATED_AT 20171005
+ENV UPDATED_AT 20171104
 
 RUN \
   apt-get update -qq \
@@ -20,6 +20,18 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
+
+####### NODE
+RUN \
+  wget --quiet -O - https://deb.nodesource.com/setup_8.x | bash - \
+    && apt-get update -qq \
+    && apt-get install -y \
+      nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+
+####### ERLANG
 ARG ERLANG_VERSION=1:20.1
 
 RUN \
@@ -31,6 +43,8 @@ RUN \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+
+####### ELIXIR
 ARG ELIXIR_VERSION=1.5.2
 
 WORKDIR /elixir
