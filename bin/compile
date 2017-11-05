@@ -70,10 +70,10 @@ main() {
   push elixir-hex-phantomjs "${elixir_version}"
 
   echo
-  echo "*** BUILDING HEX PHANTOMJS BRUNCH DOCKER IMAGE"
+  echo "*** BUILDING HEX PHANTOMJS YARN DOCKER IMAGE"
 
-  build "${erlang_version}" "${elixir_version}" Dockerfile-elixir-hex-phantomjs-brunch elixir-hex-phantomjs-brunch
-  push elixir-hex-phantomjs-brunch "${elixir_version}"
+  build "${erlang_version}" "${elixir_version}" Dockerfile-elixir-hex-phantomjs-yarn elixir-hex-phantomjs-yarn
+  push elixir-hex-phantomjs-yarn "${elixir_version}"
 }
 
 main
