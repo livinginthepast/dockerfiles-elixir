@@ -1,6 +1,6 @@
 FROM ubuntu:xenial
 
-ENV UPDATED_AT 20171104
+ENV UPDATED_AT 20180223
 
 RUN \
   apt-get update -qq \
@@ -32,7 +32,7 @@ RUN \
 
 
 ####### ERLANG
-ARG ERLANG_VERSION=1:20.1
+ARG ERLANG_VERSION=1:20.2.2
 
 RUN \
   echo "deb http://packages.erlang-solutions.com/ubuntu xenial contrib" >> /etc/apt/sources.list \

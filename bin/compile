@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-readonly DEFAULT_ERLANG='1:20.1'
-readonly DEFAULT_ELIXIR='1.5.2'
+readonly DEFAULT_ERLANG='1:20.2.2'
+readonly DEFAULT_ELIXIR='1.6.1'
 
 ask_for_erlang_version() {
   declare erlang_version
