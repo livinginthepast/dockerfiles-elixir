@@ -1,8 +1,9 @@
-ARG ELIXIR_VERSION=1.5.2
-FROM livinginthepast/elixir-hex-phantomjs:$ELIXIR_VERSION
+ARG ELIXIR_VERSION=1.9.0
+ARG OTP_VERSION=22.0.4
+FROM livinginthepast/elixir-hex:$OTP_VERSION-$ELIXIR_VERSION
 
 RUN \
-  curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+  wget -qO- https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
     && apt-get update -q \
     && apt-get install -y \

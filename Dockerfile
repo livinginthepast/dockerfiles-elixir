@@ -1,6 +1,6 @@
 FROM ubuntu:xenial
 
-ENV UPDATED_AT 20180223
+ENV UPDATED_AT 20190627
 
 RUN \
   apt-get update -qq \
@@ -23,7 +23,7 @@ ENV LC_ALL en_US.UTF-8
 
 ####### NODE
 RUN \
-  wget --quiet -O - https://deb.nodesource.com/setup_8.x | bash - \
+  wget --quiet -O - https://deb.nodesource.com/setup_12.x | bash - \
     && apt-get update -qq \
     && apt-get install -y \
       nodejs \
@@ -32,20 +32,43 @@ RUN \
 
 
 ####### ERLANG
-ARG ERLANG_VERSION=1:20.2.2
+ARG OTP_VERSION=22.0.4
 
-RUN \
-  echo "deb http://packages.erlang-solutions.com/ubuntu xenial contrib" >> /etc/apt/sources.list \
-    && apt-key adv --fetch-keys http://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc \
-    && apt-get -qq update \
-    && apt-get install -y \
-      esl-erlang=$ERLANG_VERSION \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# We'll install the build dependencies for erlang-odbc along with the erlang
+# build process:
+RUN set -xe \
+	&& OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" \
+	&& runtimeDeps='libodbc1 \
+			libsctp1 \
+			libwxgtk3.0 \
+			libssl-dev' \
+	&& buildDeps='unixodbc-dev \
+			libsctp-dev \
+			libwxgtk3.0-dev \
+			autoconf \
+			libncurses5-dev libncursesw5-dev' \
+	&& apt-get update \
+	&& apt-get install -y --no-install-recommends $runtimeDeps \
+	&& apt-get install -y --no-install-recommends $buildDeps \
+	&& wget -q -O otp-src.tar.gz "$OTP_DOWNLOAD_URL" \
+	&& export ERL_TOP="/usr/src/otp_src_${OTP_VERSION%%@*}" \
+	&& mkdir -vp $ERL_TOP \
+	&& tar -xzf otp-src.tar.gz -C $ERL_TOP --strip-components=1 \
+	&& rm otp-src.tar.gz \
+	&& ( cd $ERL_TOP \
+	  && ./otp_build autoconf \
+	  && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
+	  && ./configure --build="$gnuArch" \
+	  && make -j$(nproc) \
+	  && make install ) \
+	&& find /usr/local -name examples | xargs rm -rf \
+	&& apt-get purge -y --auto-remove $buildDeps \
+	&& rm -rf $ERL_TOP /var/lib/apt/lists/*
 
+CMD ["erl"]
 
 ####### ELIXIR
-ARG ELIXIR_VERSION=1.5.2
+ARG ELIXIR_VERSION=1.9.0
 
 WORKDIR /elixir
 RUN \

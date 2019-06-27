@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
 
-readonly DEFAULT_ERLANG='1:20.2.2'
-readonly DEFAULT_ELIXIR='1.6.1'
-
-ask_for_erlang_version() {
-  declare erlang_version
-  echo -n "Erlang version [${DEFAULT_ERLANG}]: " >&2
-  read erlang_version
-  echo "${erlang_version:-$DEFAULT_ERLANG}"
-}
+readonly DEFAULT_ELIXIR='1.9.0'
+readonly DEFAULT_OTP='22.0.3'
 
 ask_for_elixir_version() {
   echo -n "Elixir version [${DEFAULT_ELIXIR}]: " >&2
@@ -16,14 +9,21 @@ ask_for_elixir_version() {
   echo "${elixir_version:-$DEFAULT_ELIXIR}"
 }
 
+ask_for_otp_version() {
+  declare otp_version
+  echo -n "Erlang version [${DEFAULT_OTP}]: " >&2
+  read otp_version
+  echo "${otp_version:-$DEFAULT_OTP}"
+}
+
 build() {
-  declare erlang_version=$1 elixir_version=$2 dockerfile=$3 name=$4
+  declare otp_version=$1 elixir_version=$2 dockerfile=$3 name=$4
   local reference
 
-  reference=$(docker_reference ${name} ${elixir_version})
+  reference=$(docker_reference ${name} ${otp_version} ${elixir_version})
 
   docker build \
-    --build-arg ERLANG_VERSION=${erlang_version} \
+    --build-arg OTP_VERSION=${otp_version} \
     --build-arg ELIXIR_VERSION=${elixir_version} \
     -t "${reference}" \
     -f "${dockerfile}" \
@@ -31,49 +31,51 @@ build() {
 }
 
 push() {
-  declare name=$1 tag=$2
+  declare name=$1 otp_version=$2 elixir_version=$3
   local reference
 
-  reference=$(docker_reference ${name} ${elixir_version})
+  reference=$(docker_reference ${name} ${otp_version} ${elixir_version})
 
   docker push "${reference}"
 }
 
 docker_reference() {
-  declare name=$1 tag=$2
+  declare name=$1 otp_version=$2 elixir_version=$3
 
-  echo "livinginthepast/${name}:${tag}"
+  echo "livinginthepast/${name}:${otp_version}-${elixir_version}"
 }
 
 main() {
-  declare erlang_version elixir_version
-  erlang_version=$(ask_for_erlang_version)
+  declare otp_version elixir_version
+  otp_version=$(ask_for_otp_version)
   elixir_version=$(ask_for_elixir_version)
 
-  echo "Erlang: ${erlang_version}, Elixir: ${elixir_version}"
+  echo "Erlang: ${otp_version}, Elixir: ${elixir_version}"
 
   echo "*** BUILDING MAIN DOCKER IMAGE"
 
-  build "${erlang_version}" "${elixir_version}" Dockerfile elixir
-  push elixir "${elixir_version}"
+  build "${otp_version}" "${elixir_version}" Dockerfile elixir
+  push elixir "${otp_version}" "${elixir_version}"
 
   echo
   echo "*** BUILDING HEX DOCKER IMAGE"
 
-  build "${erlang_version}" "${elixir_version}" Dockerfile-elixir-hex elixir-hex
-  push elixir-hex "${elixir_version}"
+  build "${otp_version}" "${elixir_version}" Dockerfile-elixir-hex elixir-hex
+  push elixir-hex "${otp_version}" "${elixir_version}"
+
 
   echo
-  echo "*** BUILDING HEX PHANTOMJS DOCKER IMAGE"
+  echo "*** BUILDING HEX YARN DOCKER IMAGE"
 
-  build "${erlang_version}" "${elixir_version}" Dockerfile-elixir-hex-phantomjs elixir-hex-phantomjs
-  push elixir-hex-phantomjs "${elixir_version}"
+  build "${otp_version}" "${elixir_version}" Dockerfile-elixir-hex-yarn elixir-hex-yarn
+  push elixir-hex-yarn "${otp_version}" "${elixir_version}"
 
   echo
-  echo "*** BUILDING HEX PHANTOMJS YARN DOCKER IMAGE"
+  echo "*** BUILDING HEX YARN CHROMEDRIVER DOCKER IMAGE"
 
-  build "${erlang_version}" "${elixir_version}" Dockerfile-elixir-hex-phantomjs-yarn elixir-hex-phantomjs-yarn
-  push elixir-hex-phantomjs-yarn "${elixir_version}"
+  build "${otp_version}" "${elixir_version}" Dockerfile-elixir-hex-yarn-chromedriver elixir-hex-yarn-chromedriver
+  push elixir-hex-yarn-chromedriver "${otp_version}" "${elixir_version}"
+
 }
 
 main
