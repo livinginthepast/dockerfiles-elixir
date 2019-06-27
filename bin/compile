@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 readonly DEFAULT_ELIXIR='1.9.0'
-readonly DEFAULT_OTP='22.0.3'
+readonly DEFAULT_OTP='22.0.4'
 
 ask_for_elixir_version() {
   echo -n "Elixir version [${DEFAULT_ELIXIR}]: " >&2
