@@ -23,7 +23,7 @@ ENV LC_ALL en_US.UTF-8
 
 ####### NODE
 RUN \
-  wget --quiet -O - https://deb.nodesource.com/setup_12.x | bash - \
+  wget --quiet -O - https://deb.nodesource.com/setup_10.x | bash - \
     && apt-get update -qq \
     && apt-get install -y \
       nodejs \
