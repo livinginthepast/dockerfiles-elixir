@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:18.04
 
 ENV UPDATED_AT 20190627
 
@@ -58,7 +58,10 @@ RUN set -xe \
 	&& ( cd $ERL_TOP \
 	  && ./otp_build autoconf \
 	  && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
-	  && ./configure --build="$gnuArch" \
+	  && ./configure \
+	    --build="$gnuArch" \
+	    --without-javac \
+	    --disable-dynamic-ssl-lib \
 	  && make -j$(nproc) \
 	  && make install ) \
 	&& find /usr/local -name examples | xargs rm -rf \
