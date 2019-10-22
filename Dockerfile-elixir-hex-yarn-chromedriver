@@ -1,6 +1,5 @@
-ARG ELIXIR_VERSION=1.9.0
-ARG OTP_VERSION=22.0.4
-FROM livinginthepast/elixir-hex-yarn:$OTP_VERSION-$ELIXIR_VERSION
+ARG TAG
+FROM livinginthepast/elixir-hex-yarn:${TAG}
 
 RUN \
   apt-get update -qq \
